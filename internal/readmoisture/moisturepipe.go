@@ -1,4 +1,4 @@
-package moisturepipe
+package readmoisture
 
 import (
 	"fmt"
@@ -7,20 +7,12 @@ import (
 	"syscall"
 )
 
-func ReadFromMoisturePipe(wait_group *sync.WaitGroup, moisture_value *float32) {
+func ReadFromSharedMemory(wait_group *sync.WaitGroup, moisture_value *float32) {
 
 	pipeName := "moisturepipe"
 
-	_ = os.Remove(pipeName)
-
-	err := syscall.Mkfifo(pipeName, 0666)
-
-	if err != nil {
-		fmt.Println("Error from creating pipe:", err)
-
-	}
-
-	namedPipe, err := os.OpenFile(pipeName, os.O_RDONLY, os.ModeNamedPipe)
+	namedPipe, err := os.OpenFile(pipeName, syscall.O_RDONLY|syscall.O_NONBLOCK, os.ModeNamedPipe)
+	fmt.Println("Pipe opened")
 
 	if err != nil {
 		fmt.Println("Error from opening pipe:", err)
@@ -30,6 +22,7 @@ func ReadFromMoisturePipe(wait_group *sync.WaitGroup, moisture_value *float32) {
 
 	buf := make([]byte, 50)
 	for {
+		fmt.Println("HERE")
 		bytes, err := namedPipe.Read(buf)
 
 		if err != nil {

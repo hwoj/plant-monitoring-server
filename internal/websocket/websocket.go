@@ -31,6 +31,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	clients[conn] = true
+	TestUpdate()
 }
 
 func TestUpdate() {
